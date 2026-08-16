@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}SpendIntel — Student Expense Intelligence Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8 md:py-16 space-y-20">
+    
+    <!-- Hero Section -->
+    <header class="text-center space-y-6 max-w-3xl mx-auto">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-semibold uppercase tracking-wider">
+            <i class="fa-solid fa-sparkles"></i> AI-Powered Student Budgeting
+        </div>
+        <h1 class="font-display font-bold text-4xl md:text-6xl text-slate-900 dark:text-white leading-tight tracking-tight">
+            Understand Your Money. <br class="hidden md:inline">
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-emerald-500 dark:from-blue-400 dark:to-emerald-400">Build Better Habits.</span>
+        </h1>
+        <p class="text-base md:text-lg text-slate-500 dark:text-slate-400 leading-relaxed">
+            SpendIntel is an intelligent financial companion designed specifically for university students. Track expenses, monitor budgets, predict future habits, and chat with your AI assistant.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <a href="/register" class="px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg shadow-blue-500/20 transition-all duration-200 text-center">
+                Get Started
+            </a>
+            <a href="/login" class="px-8 py-3.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-medium transition-all duration-200 text-center border border-slate-300 dark:border-slate-700">
+                Log In
+            </a>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section class="space-y-12">
+        <div class="text-center space-y-3">
+            <h2 class="font-display font-bold text-2xl md:text-4xl text-slate-900 dark:text-white">Smart Features Built For Students</h2>
+            <p class="text-sm md:text-base text-slate-500 dark:text-slate-400 max-w-xl mx-auto">No generic banking spreadsheets. Get actionable insights that align with your college lifestyle.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Feature Card 1 -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-darkCard border border-lightBorder dark:border-darkBorder space-y-4 hover:border-blue-500/30 transition-all duration-300">
+                <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+                <h3 class="font-semibold text-lg text-slate-900 dark:text-white">Smart Expense Tracking</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Automatic category detection maps descriptions like "Uber to lab" directly to Transport using rule-based ML keyword checking.
+                </p>
+            </div>
+
+            <!-- Feature Card 2 -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-darkCard border border-lightBorder dark:border-darkBorder space-y-4 hover:border-blue-500/30 transition-all duration-300">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <h3 class="font-semibold text-lg text-slate-900 dark:text-white">AI Financial Assistant</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Ask natural questions like "Where did my money go?" to receive custom, secure summaries driven by the Google Gemini API.
+                </p>
+            </div>
+
+            <!-- Feature Card 3 -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-darkCard border border-lightBorder dark:border-darkBorder space-y-4 hover:border-blue-500/30 transition-all duration-300">
+                <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <h3 class="font-semibold text-lg text-slate-900 dark:text-white">Spending Analytics</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Interactive dashboards powered by Chart.js show category totals, payment trends, and essential vs non-essential breakdowns.
+                </p>
+            </div>
+
+            <!-- Feature Card 4 -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-darkCard border border-lightBorder dark:border-darkBorder space-y-4 hover:border-blue-500/30 transition-all duration-300">
+                <div class="w-12 h-12 rounded-xl bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <h3 class="font-semibold text-lg text-slate-900 dark:text-white">Budget Management</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Set pocket limits for overall spending or specific categories. Receive color-coded warning notices if you exceed 80% utilization.
+                </p>
+            </div>
+
+            <!-- Feature Card 5 -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-darkCard border border-lightBorder dark:border-darkBorder space-y-4 hover:border-blue-500/30 transition-all duration-300">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i>
+                </div>
+                <h3 class="font-semibold text-lg text-slate-900 dark:text-white">Expense Prediction</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Our Linear Regression models forecast your end-of-month totals so you can correct spending habits before going over budget.
+                </p>
+            </div>
+
+            <!-- Feature Card 6 -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-darkCard border border-lightBorder dark:border-darkBorder space-y-4 hover:border-blue-500/30 transition-all duration-300">
+                <div class="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-lightbulb"></i>
+                </div>
+                <h3 class="font-semibold text-lg text-slate-900 dark:text-white">Smart Saving Tips</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Receive non-professional, data-driven savings recommendations highlighting category budget spikes and goal tracking timelines.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="space-y-12 max-w-5xl mx-auto">
+        <div class="text-center space-y-3">
+            <h2 class="font-display font-bold text-2xl md:text-4xl text-slate-900 dark:text-white">How SpendIntel Empowers You</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+            <!-- Step 1 -->
+            <div class="space-y-3 text-center md:text-left">
+                <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm mx-auto md:mx-0">1</div>
+                <h4 class="font-semibold text-slate-900 dark:text-white">Track Log</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Quickly add canteen coffee, metro rides, or college textbooks on any device.</p>
+            </div>
+            <!-- Step 2 -->
+            <div class="space-y-3 text-center md:text-left">
+                <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm mx-auto md:mx-0">2</div>
+                <h4 class="font-semibold text-slate-900 dark:text-white">Analyze</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Automatic statistical engines evaluate standard deviations to scan for anomalies.</p>
+            </div>
+            <!-- Step 3 -->
+            <div class="space-y-3 text-center md:text-left">
+                <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm mx-auto md:mx-0">3</div>
+                <h4 class="font-semibold text-slate-900 dark:text-white">Understand</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Consult with your personal chatbot assistant to identify which categories are leaking cash.</p>
+            </div>
+            <!-- Step 4 -->
+            <div class="space-y-3 text-center md:text-left">
+                <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm mx-auto md:mx-0">4</div>
+                <h4 class="font-semibold text-slate-900 dark:text-white">Improve</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Set active targets, save money, and achieve your student milestone goals.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="p-8 md:p-12 rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-center space-y-6 max-w-4xl mx-auto shadow-xl">
+        <h2 class="font-display font-bold text-2xl md:text-4xl">Take Control of Your Student Finances Today</h2>
+        <p class="text-sm md:text-base text-blue-100 max-w-xl mx-auto">
+            Create your account in seconds, configure your pocket allowance budget, and unlock your student expense intelligence.
+        </p>
+        <div>
+            <a href="/register" class="inline-block px-8 py-3.5 rounded-xl bg-white text-blue-600 font-semibold hover:bg-slate-100 transition-colors shadow-lg">
+                Create Free Account
+            </a>
+        </div>
+    </section>
+</div>
+{% endblock %}

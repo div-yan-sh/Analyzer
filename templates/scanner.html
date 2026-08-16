@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}AI Smart Receipt Scanner — SpendIntel{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-6xl mx-auto">
+    
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-xs font-semibold mb-1 border border-amber-500/20">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Powered by Gemini 2.5 Flash Vision OCR
+            </div>
+            <h1 class="font-display font-bold text-2xl md:text-3xl text-slate-900 dark:text-white">AI Smart Receipt Scanner</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400">Upload or snap a photo of any receipt or bill to automatically extract items and log expenses</p>
+        </div>
+    </header>
+
+    <!-- Scanner Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Side: Upload & Camera Zone (5 cols) -->
+        <div class="lg:col-span-5 space-y-4">
+            <div class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-lightBorder dark:border-darkBorder shadow-sm space-y-4">
+                <h3 class="font-semibold text-sm text-slate-900 dark:text-white flex items-center justify-between">
+                    <span>1. Upload Receipt Image</span>
+                    <span class="text-[11px] text-slate-400 font-normal">JPG, PNG, WebP</span>
+                </h3>
+
+                <!-- Dropzone Area -->
+                <div id="dropZone" class="border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-2xl p-6 text-center cursor-pointer transition-all bg-slate-50/50 dark:bg-darkBg/50 flex flex-col items-center justify-center min-h-[220px] relative overflow-hidden group">
+                    <input type="file" id="receiptFileInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10">
+                    
+                    <div id="uploadPlaceholder" class="space-y-3 flex flex-col items-center">
+                        <div class="w-14 h-14 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">Click to upload or drag & drop</p>
+                            <p class="text-xs text-slate-400">Café bills, bookstore slips, mess tokens, etc.</p>
+                        </div>
+                    </div>
+
+                    <!-- Image Preview -->
+                    <div id="imagePreviewContainer" class="hidden absolute inset-0 bg-slate-900 flex items-center justify-center p-2">
+                        <img id="receiptImagePreview" src="" alt="Receipt Preview" class="max-h-full max-w-full object-contain rounded-lg">
+                        <!-- Scanning Line Animation Effect -->
+                        <div id="scanLine" class="hidden absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent shadow-[0_0_15px_#f59e0b] animate-pulse"></div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-2">
+                    <button type="button" id="btnScanAction" onclick="processReceiptImage()" disabled class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 text-white font-semibold text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> Scan with Gemini Vision
+                    </button>
+                    <button type="button" onclick="clearReceiptUpload()" class="px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-semibold transition-all" title="Clear">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Student Sample Receipts (1-Click Test) -->
+            <div class="bg-white dark:bg-darkCard p-5 rounded-2xl border border-lightBorder dark:border-darkBorder shadow-sm space-y-3">
+                <h4 class="font-semibold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-vial"></i> Or Try Sample Student Receipts
+                </h4>
+                <div class="grid grid-cols-1 gap-2" id="sampleReceiptsContainer">
+                    <button onclick="loadSampleReceipt('sample_canteen')" class="w-full p-2.5 text-left rounded-xl bg-slate-50 dark:bg-darkBg hover:bg-blue-50 dark:hover:bg-blue-950/30 border border-lightBorder dark:border-darkBorder flex items-center justify-between text-xs transition-all group">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-7 h-7 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center"><i class="fa-solid fa-utensils"></i></span>
+                            <div>
+                                <span class="font-semibold text-slate-900 dark:text-white block group-hover:text-blue-500">Canteen Lunch Slip</span>
+                                <span class="text-[10px] text-slate-400">Special Thali + Lassi</span>
+                            </div>
+                        </div>
+                        <span class="font-bold text-slate-700 dark:text-slate-300">₹185.00</span>
+                    </button>
+
+                    <button onclick="loadSampleReceipt('sample_books')" class="w-full p-2.5 text-left rounded-xl bg-slate-50 dark:bg-darkBg hover:bg-blue-50 dark:hover:bg-blue-950/30 border border-lightBorder dark:border-darkBorder flex items-center justify-between text-xs transition-all group">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center"><i class="fa-solid fa-book"></i></span>
+                            <div>
+                                <span class="font-semibold text-slate-900 dark:text-white block group-hover:text-blue-500">Bookstore & Stationery</span>
+                                <span class="text-[10px] text-slate-400">Algorithm Book + Notebooks</span>
+                            </div>
+                        </div>
+                        <span class="font-bold text-slate-700 dark:text-slate-300">₹620.00</span>
+                    </button>
+
+                    <button onclick="loadSampleReceipt('sample_hostel_pizza')" class="w-full p-2.5 text-left rounded-xl bg-slate-50 dark:bg-darkBg hover:bg-blue-50 dark:hover:bg-blue-950/30 border border-lightBorder dark:border-darkBorder flex items-center justify-between text-xs transition-all group">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-7 h-7 rounded-lg bg-rose-500/10 text-rose-500 flex items-center justify-center"><i class="fa-solid fa-pizza-slice"></i></span>
+                            <div>
+                                <span class="font-semibold text-slate-900 dark:text-white block group-hover:text-blue-500">Hostel Pizza Night</span>
+                                <span class="text-[10px] text-slate-400">Pizza + Garlic Bread</span>
+                            </div>
+                        </div>
+                        <span class="font-bold text-slate-700 dark:text-slate-300">₹849.00</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Extracted Structured Data (7 cols) -->
+        <div class="lg:col-span-7">
+            <div class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-lightBorder dark:border-darkBorder shadow-sm space-y-5 min-h-[480px] flex flex-col justify-between">
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-lightBorder dark:border-darkBorder">
+                        <div>
+                            <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">2. AI Extracted Receipt Details</h3>
+                            <p class="text-xs text-slate-400">Verify extracted transaction data before saving</p>
+                        </div>
+                        <div id="confidencePill" class="hidden px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check"></i> <span id="confidenceText">98% Accuracy</span>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyResultState" class="py-16 text-center space-y-3">
+                        <div class="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-darkBg text-slate-400 mx-auto flex items-center justify-center text-2xl">
+                            <i class="fa-solid fa-receipt"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-sm text-slate-700 dark:text-slate-300">No Receipt Scanned Yet</h4>
+                            <p class="text-xs text-slate-400 max-w-sm mx-auto">Upload an image on the left or click any sample receipt to inspect the multimodal AI extraction.</p>
+                        </div>
+                    </div>
+
+                    <!-- Extracted Form (Hidden by default) -->
+                    <form id="scannedExpenseForm" class="space-y-4 hidden">
+                        <!-- Top Highlights Banner -->
+                        <div class="p-4 rounded-xl bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-transparent border border-blue-500/20 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Total Scanned Amount</span>
+                                <h2 class="text-3xl font-extrabold text-blue-600 dark:text-blue-400 font-display" id="displayTotalAmount">₹0.00</h2>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Merchant / Place</span>
+                                <h4 class="text-base font-bold text-slate-900 dark:text-white truncate max-w-[200px]" id="displayMerchant">Store Name</h4>
+                            </div>
+                        </div>
+
+                        <!-- Editable Fields Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div class="space-y-1">
+                                <label class="text-xs font-semibold text-slate-400">Merchant / Description *</label>
+                                <input type="text" id="extractedMerchant" required class="w-full px-3 py-2 rounded-xl border border-lightBorder dark:border-darkBorder bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-xs font-semibold text-slate-400">Amount (<span class="currency-symbol">₹</span>) *</label>
+                                <input type="number" step="0.01" id="extractedAmount" required class="w-full px-3 py-2 rounded-xl border border-lightBorder dark:border-darkBorder bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-xs font-semibold text-slate-400">Category</label>
+                                <select id="extractedCategory" class="w-full px-3 py-2 rounded-xl border border-lightBorder dark:border-darkBorder bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                    <option value="Food">Food</option>
+                                    <option value="Transport">Transport</option>
+                                    <option value="Education">Education</option>
+                                    <option value="Shopping">Shopping</option>
+                                    <option value="Entertainment">Entertainment</option>
+                                    <option value="Hostel/Rent">Hostel/Rent</option>
+                                    <option value="Bills">Bills</option>
+                                    <option value="Health">Health</option>
+                                    <option value="Recharge">Recharge</option>
+                                    <option value="Travel">Travel</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-xs font-semibold text-slate-400">Subcategory</label>
+                                <input type="text" id="extractedSubcategory" class="w-full px-3 py-2 rounded-xl border border-lightBorder dark:border-darkBorder bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-xs font-semibold text-slate-400">Transaction Date</label>
+                                <input type="date" id="extractedDate" class="w-full px-3 py-2 rounded-xl border border-lightBorder dark:border-darkBorder bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-xs font-semibold text-slate-400">Payment Method</label>
+                                <select id="extractedPaymentMethod" class="w-full px-3 py-2 rounded-xl border border-lightBorder dark:border-darkBorder bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                    <option value="UPI">UPI</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Debit Card">Debit Card</option>
+                                    <option value="Credit Card">Credit Card</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Itemized Breakdown Table -->
+                        <div class="space-y-2 pt-2">
+                            <label class="text-xs font-semibold text-slate-400 flex items-center justify-between">
+                                <span>Detected Line Items Breakdown</span>
+                                <span class="text-[10px] text-slate-500" id="itemsCount">0 items</span>
+                            </label>
+                            <div class="max-h-36 overflow-y-auto rounded-xl border border-lightBorder dark:border-darkBorder bg-slate-50/50 dark:bg-darkBg/50">
+                                <table class="w-full text-left text-xs">
+                                    <thead>
+                                        <tr class="border-b border-lightBorder dark:border-darkBorder text-slate-400">
+                                            <th class="px-3 py-1.5">Item</th>
+                                            <th class="px-3 py-1.5 text-center">Qty</th>
+                                            <th class="px-3 py-1.5 text-right">Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="extractedItemsTableBody" class="divide-y divide-lightBorder dark:divide-darkBorder text-slate-700 dark:text-slate-300">
+                                        <!-- Injected via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Footer Save Action -->
+                <div id="saveActionContainer" class="pt-4 border-t border-lightBorder dark:border-darkBorder flex items-center justify-between hidden">
+                    <span class="text-xs text-slate-400">Auto-categorized & checked against anomalies</span>
+                    <button type="button" id="btnConfirmSave" onclick="saveExtractedExpense()" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-xs shadow-lg hover:shadow-xl transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-check"></i> Confirm & Save to Expenses
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/scanner.js') }}"></script>
+{% endblock %}

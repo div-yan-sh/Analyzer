@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}AI Financial Assistant — SpendIntel{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-4xl mx-auto h-[calc(100vh-140px)] flex flex-col justify-between">
+    
+    <!-- Header -->
+    <header class="border-b border-lightBorder dark:border-darkBorder pb-4 flex items-center justify-between">
+        <div>
+            <h1 class="font-display font-bold text-2xl text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-robot text-blue-500"></i> AI Financial Assistant
+            </h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Ask natural questions about your university pocket expenditures</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-xs text-slate-400 font-semibold" id="aiStatusLabel">Online (Active API)</span>
+        </div>
+    </header>
+
+    <!-- Chat Logs Window -->
+    <div id="chatWindow" class="flex-1 overflow-y-auto px-2 py-4 space-y-4 min-h-[250px] divide-y-0 scroll-smooth">
+        <!-- Greeting from AI -->
+        <div class="flex gap-3 max-w-[85%]">
+            <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center flex-shrink-0 text-sm">
+                <i class="fa-solid fa-robot"></i>
+            </div>
+            <div class="bg-white dark:bg-darkCard border border-lightBorder dark:border-darkBorder p-4 rounded-2xl rounded-tl-none shadow-sm text-sm text-slate-700 dark:text-slate-300 space-y-1">
+                <p>Hello, {{ current_user.name }}! I am your personal budget advisor. I have access to your monthly spending logs, budget limits, and goal milestones.</p>
+                <p class="text-xs text-slate-400">Ask me anything, or click one of the quick suggestions below.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Suggestions Chip Row -->
+    <div class="space-y-3">
+        <div class="flex flex-wrap gap-2" id="suggestionChips">
+            <button onclick="sendQuickMessage('Where am I spending the most?')" class="px-3.5 py-1.5 rounded-full border border-lightBorder dark:border-darkBorder hover:border-blue-500 dark:hover:border-blue-400 bg-white dark:bg-darkCard hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
+                🔍 Where is my largest spend?
+            </button>
+            <button onclick="sendQuickMessage('Am I on track with my budget?')" class="px-3.5 py-1.5 rounded-full border border-lightBorder dark:border-darkBorder hover:border-blue-500 dark:hover:border-blue-400 bg-white dark:bg-darkCard hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
+                📊 Budget tracker check
+            </button>
+            <button onclick="sendQuickMessage('Summarize my financial behavior this month.')" class="px-3.5 py-1.5 rounded-full border border-lightBorder dark:border-darkBorder hover:border-blue-500 dark:hover:border-blue-400 bg-white dark:bg-darkCard hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
+                📝 Summarize this month's stats
+            </button>
+            <button onclick="sendQuickMessage('How can I reduce my expenses?')" class="px-3.5 py-1.5 rounded-full border border-lightBorder dark:border-darkBorder hover:border-blue-500 dark:hover:border-blue-400 bg-white dark:bg-darkCard hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
+                💡 Tips to save money
+            </button>
+        </div>
+
+        <!-- Input Bar Form -->
+        <form id="chatForm" class="flex gap-2">
+            <input type="text" id="chatInput" placeholder="Type a message or click a suggestion..." required autocomplete="off"
+                   class="flex-1 px-4 py-3 rounded-xl border border-lightBorder dark:border-darkBorder bg-white dark:bg-darkCard text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            <button type="submit" class="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition-all shadow-md">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/ai-assistant.js') }}"></script>
+{% endblock %}

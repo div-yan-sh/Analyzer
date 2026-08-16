@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Profile & Settings — SpendIntel{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-8">
+    
+    <!-- Header -->
+    <header>
+        <h1 class="font-display font-bold text-2xl md:text-3xl text-slate-900 dark:text-white">Profile & Settings</h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400">Manage your college details and system preferences</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Left: Quick Profile Card (1/3) -->
+        <div class="p-6 rounded-2xl bg-white dark:bg-darkCard border border-lightBorder dark:border-darkBorder shadow-sm flex flex-col items-center justify-between text-center space-y-4">
+            <div class="w-20 h-20 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-3xl">
+                {{ current_user.name[0] | upper if current_user.name else 'S' }}
+            </div>
+            <div class="space-y-1">
+                <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">{{ current_user.name }}</h3>
+                <p class="text-xs text-slate-400 dark:text-slate-500">{{ current_user.email }}</p>
+            </div>
+            <div class="py-2.5 px-4 w-full bg-slate-50 dark:bg-darkBg rounded-xl space-y-1 border border-lightBorder dark:border-darkBorder text-left">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">University Details</span>
+                <p class="text-xs text-slate-600 dark:text-slate-300 font-medium truncate">{{ current_user.college }}</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">{{ current_user.course }} (Year {{ current_user.year }})</p>
+            </div>
+            <div class="w-full text-xs text-slate-400">
+                Created: {{ current_user.created_at.strftime('%b %d, %Y') if current_user.created_at else 'N/A' }}
+            </div>
+        </div>
+
+        <!-- Right: Settings Form blocks (2/3) -->
+        <div class="md:col-span-2 space-y-6">
+            
+            <!-- Update profile settings -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-darkCard border border-lightBorder dark:border-darkBorder shadow-sm space-y-4">
+                <h3 class="font-semibold text-slate-900 dark:text-white border-b border-lightBorder dark:border-darkBorder pb-2">Student Information</h3>
+                
+                <form id="profileForm" class="space-y-4">
+                    <div id="profileAlertBox" class="hidden p-3 rounded-lg text-sm font-medium border"></div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-xs font-semibold text-slate-400">Name</label>
+                            <input type="text" id="profName" value="{{ current_user.name }}" required
+                                   class="w-full px-3 py-2 rounded-xl border border-lightBorder dark:border-darkBorder bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-white text-xs focus:outline-none">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-xs font-semibold text-slate-400">Monthly Pocket Allowance (₹)</label>
+                            <input type="number" id="profAllowance" value="{{ current_user.monthly_income_or_allowance }}" min="0" step="100" required
+                                   class="w-full px-3 py-2 rounded-xl border border-lightBorder dark:border-darkBorder bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-white text-xs focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="col-span-2 space-y-1">
+                            <label class="text-xs font-semibold text-slate-400">University/College</label>
+                            <input type="text" id="profCollege" value="{{ current_user.college }}" required
+                                   class="w-full px-3 py-2 rounded-xl border border-lightBorder dark:border-darkBorder bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-white text-xs focus:outline-none">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-xs font-semibold text-slate-400">Course Year</label>
+                            <select id="profYear" class="w-full px-3 py-2 rounded-xl border border-lightBorder dark:border-darkBorder bg-slate-50 dark:bg-darkBg text-slate-950 dark:text-white text-xs focus:outline-none">
+                                <option value="1" {% if current_user.year == 1 %}selected{% endif %}>1st Year</option>
+                                <option value="2" {% if current_user.year == 2 %}selected{% endif %}>2nd Year</option>
+                                <option value="3" {% if current_user.year == 3 %}selected{% endif %}>3rd Year</option>
+                                <option value="4" {% if current_user.year == 4 %}selected{% endif %}>4th Year</option>
+                                <option value="5" {% if current_user.year == 5 %}selected{% endif %}>5th Year</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-slate-400">Course Name</label>
+                        <input type="text" id="profCourse" value="{{ current_user.course }}" required
+                               class="w-full px-3 py-2 rounded-xl border border-lightBorder dark:border-darkBorder bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-white text-xs focus:outline-none">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-slate-400">Change Password (Leave blank to keep current)</label>
+                        <input type="password" id="profPassword" placeholder="••••••••"
+                               class="w-full px-3 py-2 rounded-xl border border-lightBorder dark:border-darkBorder bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-white text-xs focus:outline-none">
+                    </div>
+
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs transition-all shadow-md">
+                        Save Changes
+                    </button>
+                </form>
+            </div>
+
+            <!-- Utilities / Data Actions -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-darkCard border border-lightBorder dark:border-darkBorder shadow-sm space-y-4">
+                <h3 class="font-semibold text-slate-900 dark:text-white border-b border-lightBorder dark:border-darkBorder pb-2 text-rose-500">System Preferences & Data Controls</h3>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Export Box -->
+                    <div class="space-y-2.5">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Data Portability</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                            Backup all your local transaction data by exporting it directly to standard formats.
+                        </p>
+                        <div class="flex gap-2">
+                            <button onclick="exportData('csv')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all">
+                                <i class="fa-solid fa-file-csv text-emerald-500"></i> Export CSV
+                            </button>
+                            <button onclick="exportData('json')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all">
+                                <i class="fa-solid fa-file-code text-blue-500"></i> Export JSON
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Reset Application Box -->
+                    <div class="space-y-2.5">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-rose-500">Destructive Actions</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                            Wipes all transactions, budgets, goals, and customized insights. This action is permanent!
+                        </p>
+                        <button onclick="resetData()" class="px-4 py-2 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all">
+                            <i class="fa-solid fa-trash-arrow-up"></i> Reset All Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}

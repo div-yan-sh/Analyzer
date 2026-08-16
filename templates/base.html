@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SpendIntel — Student Expense Intelligence{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['"Space Grotesk"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        darkBg: '#0B0F19',
+                        darkCard: '#151C2C',
+                        darkBorder: '#1F293D',
+                        lightBg: '#F8FAFC',
+                        lightCard: '#FFFFFF',
+                        lightBorder: '#E2E8F0',
+                        brandBlue: '#3B82F6',
+                        brandGreen: '#10B981',
+                        brandCoral: '#F43F5E',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .glow-accent {
+            box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.3);
+        }
+        .fab-enter {
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease;
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-lightBg text-slate-800 dark:bg-darkBg dark:text-slate-200 min-h-screen flex flex-col font-sans transition-colors duration-300 antialiased selection:bg-blue-500 selection:text-white">
+    
+    <!-- Sidebar / Top Nav Wrapper -->
+    <div class="flex flex-col md:flex-row min-h-screen">
+        
+        <!-- Sidebar Navigation -->
+        {% if current_user %}
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-darkCard border-r border-lightBorder dark:border-darkBorder transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col justify-between overflow-y-auto">
+            <div>
+                <!-- Logo -->
+                <div class="h-16 flex items-center justify-between px-6 border-b border-lightBorder dark:border-darkBorder bg-slate-50 dark:bg-[#111723]">
+                    <a href="/dashboard" class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold shadow-md">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <span class="font-display font-bold text-lg text-slate-900 dark:text-white tracking-tight">SpendIntel</span>
+                    </a>
+                    <span class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20">v2.0</span>
+                </div>
+
+                <!-- Profile Info Summary (with Google Avatar Support) -->
+                <div class="px-5 py-4 border-b border-lightBorder dark:border-darkBorder bg-slate-50/50 dark:bg-[#111723]/30">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            {% if current_user.avatar_url %}
+                            <img src="{{ current_user.avatar_url }}" alt="{{ current_user.name }}" class="w-10 h-10 rounded-full object-cover ring-2 ring-blue-500/30">
+                            {% else %}
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-base shadow-sm">
+                                {{ current_user.name[0] | upper if current_user.name else 'S' }}
+                            </div>
+                            {% endif %}
+                            {% if current_user.google_id %}
+                            <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-white dark:bg-darkCard rounded-full flex items-center justify-center shadow-xs text-[10px]" title="Google Verified Account">
+                                <i class="fa-brands fa-google text-red-500"></i>
+                            </span>
+                            {% endif %}
+                        </div>
+                        <div class="overflow-hidden">
+                            <h4 class="font-semibold text-sm text-slate-900 dark:text-white truncate">{{ current_user.name }}</h4>
+                            <span class="text-xs text-slate-500 dark:text-slate-400 block truncate">{{ current_user.course or 'Student' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="px-3 py-4 space-y-1">
+                    <a href="/dashboard" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-[#1E293B] dark:hover:text-white" data-path="/dashboard">
+                        <i class="fa-solid fa-chart-pie w-5 text-blue-500"></i> Dashboard
+                    </a>
+                    <a href="/expenses" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-[#1E293B] dark:hover:text-white" data-path="/expenses">
+                        <i class="fa-solid fa-receipt w-5 text-indigo-500"></i> Expenses
+                    </a>
+                    
+                    <!-- NEW: AI Smart Receipt Scanner -->
+                    <a href="/scanner" class="nav-link flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-[#1E293B] dark:hover:text-white" data-path="/scanner">
+                        <span class="flex items-center gap-3">
+                            <i class="fa-solid fa-camera-retro w-5 text-amber-500"></i> Smart Scanner
+                        </span>
+                        <span class="text-[10px] bg-amber-500/10 text-amber-500 font-bold px-1.5 py-0.5 rounded-md">OCR</span>
+                    </a>
+
+                    <!-- NEW: Roommate / Group Bill Splitter -->
+                    <a href="/split" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-[#1E293B] dark:hover:text-white" data-path="/split">
+                        <i class="fa-solid fa-users-viewfinder w-5 text-emerald-500"></i> Roommate Split
+                    </a>
+
+                    <!-- NEW: Recurring Subscriptions Tracker -->
+                    <a href="/subscriptions" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-[#1E293B] dark:hover:text-white" data-path="/subscriptions">
+                        <i class="fa-solid fa-calendar-check w-5 text-rose-500"></i> Subscriptions
+                    </a>
+
+                    <div class="pt-2 pb-1 px-3">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Analytics & AI</span>
+                    </div>
+
+                    <a href="/analytics" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-[#1E293B] dark:hover:text-white" data-path="/analytics">
+                        <i class="fa-solid fa-chart-line w-5 text-cyan-500"></i> Analytics
+                    </a>
+                    <a href="/budget" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-[#1E293B] dark:hover:text-white" data-path="/budget">
+                        <i class="fa-solid fa-wallet w-5 text-purple-500"></i> Budget
+                    </a>
+                    <a href="/goals" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-[#1E293B] dark:hover:text-white" data-path="/goals">
+                        <i class="fa-solid fa-bullseye w-5 text-teal-500"></i> Goals
+                    </a>
+                    <a href="/insights" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-[#1E293B] dark:hover:text-white" data-path="/insights">
+                        <i class="fa-solid fa-lightbulb w-5 text-yellow-500"></i> Smart Insights
+                    </a>
+                    <a href="/ai-assistant" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-[#1E293B] dark:hover:text-white" data-path="/ai-assistant">
+                        <i class="fa-solid fa-robot w-5 text-blue-400"></i> AI Assistant
+                    </a>
+                    <a href="/profile" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-[#1E293B] dark:hover:text-white" data-path="/profile">
+                        <i class="fa-solid fa-gear w-5 text-slate-400"></i> Settings
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Sidebar Footer Controls -->
+            <div class="p-4 border-t border-lightBorder dark:border-darkBorder space-y-2 bg-slate-50 dark:bg-[#111723]/30">
+                <!-- Currency Selector -->
+                <div class="flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-[#1E293B] text-xs">
+                    <span class="text-slate-500 dark:text-slate-400 flex items-center gap-1.5"><i class="fa-solid fa-coins"></i> Currency:</span>
+                    <select id="currencySelect" onchange="changeCurrency(this.value)" class="bg-transparent font-bold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer">
+                        <option value="₹">₹ INR</option>
+                        <option value="$">$ USD</option>
+                        <option value="€">€ EUR</option>
+                        <option value="£">£ GBP</option>
+                    </select>
+                </div>
+
+                <!-- Theme Toggle Button -->
+                <button id="themeToggle" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium hover:bg-slate-100 dark:hover:bg-[#1E293B] text-slate-600 dark:text-slate-400">
+                    <span class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-moon dark:hidden"></i>
+                        <i class="fa-solid fa-sun hidden dark:inline"></i>
+                        Theme
+                    </span>
+                    <span class="text-[10px] bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded text-slate-700 dark:text-slate-300 capitalize" id="themeStatus">dark</span>
+                </button>
+
+                <!-- Logout -->
+                <button onclick="handleLogout()" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors duration-150">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </button>
+            </div>
+        </aside>
+        {% endif %}
+
+        <!-- Mobile Header Bar -->
+        <div class="md:hidden flex items-center justify-between px-6 h-16 bg-white dark:bg-darkCard border-b border-lightBorder dark:border-darkBorder {% if current_user %}sticky top-0 z-40{% endif %}">
+            <a href="/" class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold shadow-sm">
+                    <i class="fa-solid fa-graduation-cap text-sm"></i>
+                </div>
+                <span class="font-display font-bold text-base text-slate-900 dark:text-white">SpendIntel</span>
+            </a>
+            
+            <div class="flex items-center gap-3">
+                {% if current_user %}
+                <button id="mobileMenuBtn" class="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-darkBg">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                {% else %}
+                <a href="/login" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-600 text-white">Login</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 {% if current_user %}md:pl-64{% endif %} flex flex-col min-h-screen">
+            <div class="flex-1 p-5 md:p-8">
+                {% block content %}{% endblock %}
+            </div>
+
+            <!-- Footer -->
+            <footer class="py-6 px-8 border-t border-lightBorder dark:border-darkBorder text-center text-xs text-slate-400 dark:text-slate-500 bg-slate-50/50 dark:bg-darkCard/30 mt-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+                <div>&copy; 2026 SpendIntel — Smart Student Pocket Allowance & Financial Intelligence.</div>
+                <div class="flex items-center gap-4">
+                    <a href="/scanner" class="hover:text-blue-500 transition-colors">AI Scanner</a>
+                    <a href="/split" class="hover:text-blue-500 transition-colors">Bill Splitter</a>
+                    <a href="/subscriptions" class="hover:text-blue-500 transition-colors">Subscriptions</a>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Floating Action Button (FAB) Speed Dial for Quick Logging -->
+    {% if current_user %}
+    <div id="fabContainer" class="fixed bottom-6 right-6 z-40 flex flex-col-reverse items-end gap-3">
+        <!-- Main Trigger Button -->
+        <button id="fabMainBtn" onclick="toggleFab()" class="w-14 h-14 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-xl flex items-center justify-center text-xl transition-all duration-300 transform hover:scale-105 glow-accent">
+            <i id="fabIcon" class="fa-solid fa-plus transition-transform duration-300"></i>
+        </button>
+
+        <!-- Speed Dial Actions -->
+        <div id="fabMenu" class="hidden flex-col items-end gap-2.5 mb-1">
+            <!-- Action 1: Smart OCR Receipt Scanner -->
+            <a href="/scanner" class="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white dark:bg-darkCard border border-lightBorder dark:border-darkBorder shadow-lg text-xs font-semibold text-slate-800 dark:text-white hover:border-amber-500 transition-all">
+                <span>Scan Receipt</span>
+                <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-camera"></i>
+                </div>
+            </a>
+            <!-- Action 2: Voice Expense Logger -->
+            <button onclick="openVoiceModal()" class="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white dark:bg-darkCard border border-lightBorder dark:border-darkBorder shadow-lg text-xs font-semibold text-slate-800 dark:text-white hover:border-rose-500 transition-all">
+                <span>Voice Logger</span>
+                <div class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-microphone"></i>
+                </div>
+            </button>
+            <!-- Action 3: Quick Add Manual -->
+            <a href="/expenses?openModal=1" class="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white dark:bg-darkCard border border-lightBorder dark:border-darkBorder shadow-lg text-xs font-semibold text-slate-800 dark:text-white hover:border-blue-500 transition-all">
+                <span>Manual Entry</span>
+                <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-pen"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Voice Expense Logger Modal -->
+    <div id="voiceModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm hidden">
+        <div class="w-full max-w-md bg-white dark:bg-darkCard p-6 rounded-2xl border border-lightBorder dark:border-darkBorder shadow-2xl space-y-4 text-center">
+            <div class="flex justify-between items-center pb-2 border-b border-lightBorder dark:border-darkBorder">
+                <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-microphone-lines text-rose-500"></i> AI Voice Logger
+                </h3>
+                <button onclick="closeVoiceModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+                Say something like: <br><span class="italic text-slate-700 dark:text-slate-300">"Spent 180 rupees on lunch with UPI"</span> or <span class="italic text-slate-700 dark:text-slate-300">"$25 for textbooks using debit card"</span>
+            </p>
+
+            <!-- Mic Animation Circle -->
+            <div class="py-4 flex flex-col items-center justify-center">
+                <button id="voiceRecordBtn" onclick="toggleVoiceRecording()" class="w-20 h-20 rounded-full bg-rose-500 text-white flex items-center justify-center text-2xl shadow-lg hover:bg-rose-600 transition-all duration-300 transform active:scale-95">
+                    <i id="micIcon" class="fa-solid fa-microphone"></i>
+                </button>
+                <span id="voiceStatus" class="mt-3 text-xs font-semibold text-slate-500 dark:text-slate-400">Click to speak</span>
+            </div>
+
+            <!-- Transcription Preview -->
+            <div id="voiceTranscriptBox" class="min-h-[50px] p-3 rounded-xl bg-slate-50 dark:bg-darkBg border border-lightBorder dark:border-darkBorder text-xs text-slate-700 dark:text-slate-300 text-left">
+                <span class="text-slate-400 italic">Spoken words will appear here...</span>
+            </div>
+
+            <!-- Parsed Result & Save -->
+            <div id="voiceResultBox" class="hidden p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-600 dark:text-emerald-400 space-y-2 text-left">
+                <div class="font-bold flex justify-between">
+                    <span>Parsed Expense:</span>
+                    <span id="voiceParsedAmount">₹0.00</span>
+                </div>
+                <div id="voiceParsedSummary" class="text-slate-700 dark:text-slate-300 text-[11px]"></div>
+                <button id="voiceSaveBtn" onclick="saveVoiceExpense()" class="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-all shadow-sm">
+                    Confirm & Save Expense
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Backdrop for mobile menu drawer -->
+    <div id="sidebarBackdrop" class="fixed inset-0 z-40 bg-slate-950/50 backdrop-blur-sm hidden transition-opacity duration-300 md:hidden"></div>
+
+    <!-- Core Javascript Scripts -->
+    <script>
+        // Currency Handling
+        window.CURRENT_CURRENCY = localStorage.getItem('currencySymbol') || '₹';
+        function changeCurrency(newSymbol) {
+            localStorage.setItem('currencySymbol', newSymbol);
+            window.CURRENT_CURRENCY = newSymbol;
+            window.dispatchEvent(new CustomEvent('currencyChanged', { detail: newSymbol }));
+            location.reload();
+        }
+
+        // Set Currency select value on load
+        document.addEventListener("DOMContentLoaded", () => {
+            const currSel = document.getElementById('currencySelect');
+            if (currSel) currSel.value = window.CURRENT_CURRENCY;
+        });
+
+        // Set Theme immediately
+        const theme = localStorage.getItem('theme') || 'dark';
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.getElementById('themeStatus') && (document.getElementById('themeStatus').innerText = 'dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.getElementById('themeStatus') && (document.getElementById('themeStatus').innerText = 'light');
+        }
+
+        // Active path highlighting
+        document.addEventListener("DOMContentLoaded", () => {
+            const currentPath = window.location.pathname;
+            document.querySelectorAll(".nav-link").forEach(link => {
+                if (link.getAttribute("data-path") === currentPath) {
+                    link.classList.remove("text-slate-600", "dark:text-slate-400");
+                    link.classList.add("bg-blue-50", "text-blue-600", "dark:bg-blue-950/40", "dark:text-blue-400", "border-r-4", "border-blue-600");
+                }
+            });
+
+            // Mobile menu drawer toggle
+            const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+            const sidebar = document.getElementById("sidebar");
+            const backdrop = document.getElementById("sidebarBackdrop");
+
+            if (mobileMenuBtn && sidebar && backdrop) {
+                mobileMenuBtn.addEventListener("click", () => {
+                    sidebar.classList.remove("-translate-x-full");
+                    backdrop.classList.remove("hidden");
+                });
+
+                backdrop.addEventListener("click", () => {
+                    sidebar.classList.add("-translate-x-full");
+                    backdrop.classList.add("hidden");
+                });
+            }
+
+            // Dark mode switcher
+            const themeToggle = document.getElementById("themeToggle");
+            if (themeToggle) {
+                themeToggle.addEventListener("click", () => {
+                    const isDark = document.documentElement.classList.toggle('dark');
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    document.getElementById('themeStatus').innerText = isDark ? 'dark' : 'light';
+                });
+            }
+        });
+
+        // FAB Speed Dial Toggle
+        function toggleFab() {
+            const menu = document.getElementById('fabMenu');
+            const icon = document.getElementById('fabIcon');
+            if (menu) {
+                const isHidden = menu.classList.toggle('hidden');
+                if (!isHidden) {
+                    menu.classList.add('flex');
+                    icon.classList.add('rotate-45');
+                } else {
+                    menu.classList.remove('flex');
+                    icon.classList.remove('rotate-45');
+                }
+            }
+        }
+
+        // Voice Logger Modal Logic (Web Speech API)
+        let recognition = null;
+        let isRecording = false;
+        let lastParsedData = null;
+
+        function openVoiceModal() {
+            document.getElementById('voiceModal')?.classList.remove('hidden');
+            if (document.getElementById('fabMenu')) {
+                document.getElementById('fabMenu').classList.add('hidden');
+                document.getElementById('fabIcon')?.classList.remove('rotate-45');
+            }
+        }
+
+        function closeVoiceModal() {
+            if (recognition && isRecording) recognition.stop();
+            document.getElementById('voiceModal')?.classList.add('hidden');
+            document.getElementById('voiceResultBox')?.classList.add('hidden');
+            document.getElementById('voiceTranscriptBox').innerHTML = '<span class="text-slate-400 italic">Spoken words will appear here...</span>';
+            document.getElementById('voiceStatus').innerText = 'Click to speak';
+            isRecording = false;
+        }
+
+        function toggleVoiceRecording() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                // Fallback for browsers without speech API: prompt user for text
+                const textInput = prompt("Your browser speech recognition is offline. Type what you spent (e.g. 'Spent 150 on snacks via UPI'):");
+                if (textInput) {
+                    processVoiceText(textInput);
+                }
+                return;
+            }
+
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+            if (!recognition) {
+                recognition = new SpeechRec();
+                recognition.continuous = false;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = () => {
+                    isRecording = true;
+                    document.getElementById('voiceStatus').innerText = 'Listening... Speak now!';
+                    document.getElementById('voiceRecordBtn').classList.add('animate-pulse', 'ring-4', 'ring-rose-400');
+                };
+
+                recognition.onresult = (event) => {
+                    let transcript = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        transcript += event.results[i][0].transcript;
+                    }
+                    document.getElementById('voiceTranscriptBox').innerText = transcript;
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    document.getElementById('voiceStatus').innerText = 'Error: ' + event.error;
+                    document.getElementById('voiceRecordBtn').classList.remove('animate-pulse', 'ring-4', 'ring-rose-400');
+                    isRecording = false;
+                };
+
+                recognition.onend = () => {
+                    isRecording = false;
+                    document.getElementById('voiceRecordBtn').classList.remove('animate-pulse', 'ring-4', 'ring-rose-400');
+                    document.getElementById('voiceStatus').innerText = 'Processing with AI...';
+                    const transcript = document.getElementById('voiceTranscriptBox').innerText.trim();
+                    if (transcript && !transcript.includes('Spoken words')) {
+                        processVoiceText(transcript);
+                    } else {
+                        document.getElementById('voiceStatus').innerText = 'Click to speak';
+                    }
+                };
+            }
+
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        }
+
+        async function processVoiceText(text) {
+            document.getElementById('voiceStatus').innerText = 'AI parsing entities...';
+            try {
+                const res = await fetch('/api/ai/parse-voice', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                const data = await res.json();
+                if (data.success && data.expense) {
+                    lastParsedData = data.expense;
+                    document.getElementById('voiceResultBox').classList.remove('hidden');
+                    document.getElementById('voiceParsedAmount').innerText = `${window.CURRENT_CURRENCY}${data.expense.amount.toFixed(2)}`;
+                    document.getElementById('voiceParsedSummary').innerHTML = `
+                        <b>Desc:</b> ${data.expense.description}<br>
+                        <b>Category:</b> ${data.expense.category} (${data.expense.subcategory || 'General'})<br>
+                        <b>Method:</b> ${data.expense.payment_method} | <b>Date:</b> ${data.expense.expense_date}
+                    `;
+                    document.getElementById('voiceStatus').innerText = 'Ready to save!';
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('voiceStatus').innerText = 'Failed to parse speech.';
+            }
+        }
+
+        async function saveVoiceExpense() {
+            if (!lastParsedData) return;
+            const btn = document.getElementById('voiceSaveBtn');
+            btn.disabled = true;
+            btn.innerText = 'Saving...';
+            try {
+                const res = await fetch('/api/expenses', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(lastParsedData)
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert('Expense logged successfully via Voice!');
+                    closeVoiceModal();
+                    if (window.location.pathname === '/expenses' || window.location.pathname === '/dashboard') {
+                        location.reload();
+                    }
+                } else {
+                    alert('Error saving: ' + (data.error || 'Unknown error'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Failed to connect to server.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Confirm & Save Expense';
+            }
+        }
+
+        // Safe Logout handler
+        async function handleLogout() {
+            if (!confirm("Are you sure you want to log out?")) return;
+            try {
+                const response = await fetch('/api/auth/logout', { method: 'POST' });
+                if (response.ok) {
+                    window.location.href = '/login';
+                }
+            } catch (err) {
+                console.error("Logout failed", err);
+            }
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
